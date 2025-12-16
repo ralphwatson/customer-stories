@@ -6,7 +6,9 @@ import {
   search as searchTable,
   getRowView,
   turnToPage,
-  addRow as addTableRow,
+  addRow,
+  onInfoCloned,
+  onPaginateCloned,
   initDisplayOptions } from '../tables';
 
 type ResourceFilters = (
@@ -114,6 +116,9 @@ export default class ResourceController extends Controller<HTMLElement> {
     }
   }
 
+  onTableInfoCloned = onInfoCloned.bind(this);
+  onTablePaginateCloned = onPaginateCloned.bind(this);
+
   onTomselectSearch(e: CustomEvent) {
     if (this.hasDatatableTarget) {
       searchTable.call(this, e.detail.searchSelectResults);
@@ -218,7 +223,7 @@ export default class ResourceController extends Controller<HTMLElement> {
       if (page !== this.currentPage) await turnToPage.call(this, page);
       this.rowViewValue = { position: rowView.position, html: rowViewHtml };
     }
-    addTableRow.call(this, rowData, true)
+    addRow.call(this, rowData, true)
       .then(getView)
       .then(showView)
       .catch(err => { console.error('Error showing new row view:', err); });
@@ -251,28 +256,6 @@ export default class ResourceController extends Controller<HTMLElement> {
         new CustomEvent('toast', { detail: { errors: [mesg] }, bubbles: true })
       );
     }
-  }
-
-  onTableInfoCloned(this: ResourceControllerWithDatatable, e: CustomEvent) {
-    const { clone, pageInfo } = e.detail;
-    
-    // NOTE: The page end value from datatables is exclusive,
-    // so it is the index of the last row on the page + 1.
-    // => Transform this before passing to table nav controller
-    this.tableNavTarget.setAttribute(
-      'data-table-nav-page-info-value',
-      JSON.stringify({ ...pageInfo, end: pageInfo.end - 1 })
-    );
-    this.currentPage = pageInfo.page;
-    
-    // Pass the clone via an outlet since it is a complex object with attached event listeners,
-    // thus can't be passed by data attribute
-    this.tableNavOutlet.infoTarget.replaceChildren(clone);
-  }
-
-  onTablePaginateCloned(this: ResourceControllerWithDatatable, e: CustomEvent) {
-    const { clone } = e.detail;
-    this.tableNavOutlet.paginateTarget.replaceChildren(clone);
   }
 
   onRowDeleted({ detail: { id, storyId } }: { detail: { id: number, storyId?: number } }) {

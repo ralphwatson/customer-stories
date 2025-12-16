@@ -103,6 +103,28 @@ export function deleteRow(this: DatatableController, tr: HTMLTableRowElement, pa
   });
 }
 
+export function onInfoCloned(this: ResourceControllerWithDatatable, e: CustomEvent) {
+  const { clone, pageInfo } = e.detail;
+  
+  // NOTE: The page end value from datatables is exclusive,
+  // so it is the index of the last row on the page + 1.
+  // => Transform this before passing to table nav controller
+  this.tableNavTarget.setAttribute(
+    'data-table-nav-page-info-value',
+    JSON.stringify({ ...pageInfo, end: pageInfo.end - 1 })
+  );
+  this.currentPage = pageInfo.page;
+  
+  // Pass the clone via an outlet since it is a complex object with attached event listeners,
+  // thus can't be passed by data attribute
+  this.tableNavOutlet.infoTarget.replaceChildren(clone);
+}
+
+export function onPaginateCloned(this: ResourceControllerWithDatatable, e: CustomEvent) {
+  const { clone } = e.detail;
+  this.tableNavOutlet.paginateTarget.replaceChildren(clone);
+}
+
 export function initDisplayOptions(this: ResourceController, isReset = false) {
   const btn = this.displayOptionsBtnTarget;
   if (isReset) {
