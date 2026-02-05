@@ -1,12 +1,9 @@
+# frozen_string_literal: true
 
-# http://kevinkuchta.com/_site/2014/09/load-useful-data-in-rails-console/
-
-class Object
-  private
-  def acme
-    @_acme ||= Company.find(1)
-  end
-  def ryan
-    @_ryan ||= User.find_by(email:'ryan@customerstories.net')
-  end
+# See also ~/.pryrc for user-level console configuration
+begin
+  require_relative 'app/lib/console_helpers'
+  include ConsoleHelpers if defined?(ConsoleHelpers)
+rescue LoadError => e
+  puts "ConsoleHelpers not loaded: #{e.message}"
 end
