@@ -17,12 +17,7 @@ class Story < ApplicationRecord
   # the name of the enum and keys here must be distinct,
   # otherwise there is a conflict with the enum method 'published?'
   # NOTE: Don't use 0 for the first value as this will have unintended consequences in the select UI
-  enum status_new: {
-    draft: 1,
-    listed: 2,
-    previewed: 3,
-    is_published: 4
-  }
+  enum :status_new, { draft: 1, listed: 2, previewed: 3, is_published: 4 }
 
   belongs_to :success
   has_one :company, through: :success

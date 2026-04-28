@@ -11,7 +11,7 @@ class ContributorInvitation < ApplicationRecord
   has_one :sender, through: :contribution, source: :curator
   has_one :recipient, through: :contribution, source: :contributor
 
-  enum status: %i[pending sent]
+  enum :status, %i[pending sent]
 
   def populate_template
     populate_email_subject
